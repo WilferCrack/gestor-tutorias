@@ -36,9 +36,26 @@ public class Main{
         System.out.println("\n[Available Sbjects]");
         System.out.println("1. " + math.getName());
         System.out.println("2. " + physics.getName());
-        System.out.println("3. " + chemistry.getName());
-        System.out.println("Select a subject (1-3): ");
-        int choice = scanner.nextInt();
+        System.out.println("3. " + chemistry.getName());                        
+            // --- NUEVA LÓGICA DE VALIDACIÓN ---
+        int choice = -1;
+        boolean isValid = false;
+
+        while(!isValid) {
+            System.out.println("Select a subject (1-3): ");
+            String input = scanner.nextLine();
+            try {
+                choice = Integer.parseInt(input);
+
+                if (choice >= 1 && choice <= 3) {
+                    isValid = true;
+                } else{
+                    System.out.println("Invalid number. Please select 1, 2, or 3.\n");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error: You cannot enter letters. Please enter a number.\n");
+            }
+        }
 
         //Logica de seleccion
         Subject selectedSubject = null;
@@ -51,8 +68,7 @@ public class Main{
         } else {
             System.out.println("Invalid choice. Defaul to Algebra");
             selectedSubject = math;
-        }
-            
+        }            
 
         //Inscribir al student en las materias (¡El paso que faltaba!)
         student.enroll(selectedSubject);
