@@ -31,7 +31,7 @@ public class Student {
     public String getEmail() {
         return email;
     }
-    // Método para inscribir al alumno en una materia
+    // Método para inscribir al student en una materia
     public void enroll(Subject subject){
         enrolledSubjects.add(subject);
         System.out.println(this.name + " se ha inscrito exitosamente en " + subject.getName());

@@ -11,7 +11,7 @@ public class TutoringSession {
     private LocalDateTime sessionDate;
 
     //Constructor
-    public TutoringSession(Student student, Subject subjet, LocalDateTime sessionDate) {
+    public TutoringSession(Student student, Subject subject, LocalDateTime sessionDate) {
         this.student = student;
         this.subject = subject;
         this.sessionDate = sessionDate;
