@@ -1,7 +1,8 @@
 import model.Subject;
 import model.Student;
 import model.TutoringSession;
-import repository.StudentRepository; //nueva capa de datos
+import repository.StudentRepository;
+import util.Validator; // <-- Importamos nuestra nueva herramienta
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -9,8 +10,6 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] arg) {
         Scanner scanner = new Scanner(System.in);
-        
-        // Encendemos nuestra "Base de datos" al arrancar el programa
         StudentRepository studentRepo = new StudentRepository();
 
         Subject math = new Subject("Algebra");
@@ -26,27 +25,10 @@ public class Main {
         System.out.print("Enter your last name: ");
         String lastName = scanner.nextLine();
 
-                // VALIDACIÓN DE EMAIL
-        String email = "";
-        boolean isValidEmail = false;
-
-        while (!isValidEmail) {
-            System.out.print("Enter your email: ");
-            email = scanner.nextLine();
-
-            // Usamos el método .matches() de Java con un patrón Regex básico
-            // "^.+@.+\\..+$" significa: Algo + @ + Algo + . + Algo
-            if (email.matches("^.+@.+\\..+$")) {
-                isValidEmail = true;
-            } else {
-                System.out.println("Error: Invalid email format. Please make sure it includes '@' and a domain (e.g., .com).\n");
-            }
-        }
-
+        // 1. Usamos el validador con una sola línea de código
+        String email = Validator.readValidEmail(scanner, "Enter your email: ");
 
         Student student = new Student(name, lastName, email);
-        
-        // GUARDAMOS EL ALUMNO OFICIALMENTE EN EL REPOSITORIO
         studentRepo.save(student);
 
         System.out.println("\n[Available Subjects]");
@@ -54,25 +36,8 @@ public class Main {
         System.out.println("2. " + physics.getName());
         System.out.println("3. " + chemistry.getName());
         
-        int choice = -1;
-        boolean isValid = false;
-
-        // Bucle de validación que construiste
-        while (!isValid) {
-            System.out.print("Select a subject (1-3): ");
-            String input = scanner.nextLine();
-
-            try {
-                choice = Integer.parseInt(input);
-                if (choice >= 1 && choice <= 3) {
-                    isValid = true;
-                } else {
-                    System.out.println("Invalid number. Please select 1, 2, or 3.\n");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Error: You cannot enter letters. Please enter a number.\n");
-            }
-        }
+        // 2. Usamos el validador para el menú con una sola línea de código
+        int choice = Validator.readValidInt(scanner, "Select a subject (1-3): ", 1, 3);
 
         Subject selectedSubject = null;
         if (choice == 1) {
