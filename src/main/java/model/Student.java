@@ -13,6 +13,8 @@ public class Student {
     private List<Subject> enrolledSubjects;
     
     //Constructor
+    public Student() {
+    }
     public Student(String name, String lastName, String email){
         this.name = name;
         this.lastName = lastName;

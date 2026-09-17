@@ -3,7 +3,9 @@ package repository;
 import model.Student;
 import java.util.List;
 import java.util.ArrayList;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class StudentRepository {
     private List<Student> database;
 
@@ -19,4 +21,16 @@ public class StudentRepository {
     public List<Student> findAll() {
         return database;
     }
+
+    // NUEVA REGLA: Buscar si el email ya existe en la lista
+    public boolean existsByEmail(String email) {
+        for (Student s : database) {
+            // equalsIgnoreCase compara ignorando si hay mayúsculas o minúsculas
+            if (s.getEmail().equalsIgnoreCase(email)) {
+                return true; 
+            }
+        }
+        return false;
+    }
+
 }
