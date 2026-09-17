@@ -26,8 +26,23 @@ public class Main {
         System.out.print("Enter your last name: ");
         String lastName = scanner.nextLine();
 
-        System.out.print("Enter your email: ");
-        String email = scanner.nextLine();
+                // VALIDACIÓN DE EMAIL
+        String email = "";
+        boolean isValidEmail = false;
+
+        while (!isValidEmail) {
+            System.out.print("Enter your email: ");
+            email = scanner.nextLine();
+
+            // Usamos el método .matches() de Java con un patrón Regex básico
+            // "^.+@.+\\..+$" significa: Algo + @ + Algo + . + Algo
+            if (email.matches("^.+@.+\\..+$")) {
+                isValidEmail = true;
+            } else {
+                System.out.println("Error: Invalid email format. Please make sure it includes '@' and a domain (e.g., .com).\n");
+            }
+        }
+
 
         Student student = new Student(name, lastName, email);
         
