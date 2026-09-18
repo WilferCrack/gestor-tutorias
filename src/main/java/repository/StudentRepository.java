@@ -33,4 +33,15 @@ public class StudentRepository {
         return false;
     }
 
+    // NUEVO: Buscar y devolver el objeto Student usando su correo
+    public Student findByEmail(String email) {
+        for (Student s : database) {
+            if (s.getEmail().equalsIgnoreCase(email)) {
+                return s; // Lo encontramos, lo devolvemos
+            }
+        }
+        return null; // No existe
+    }
+
+
 }

@@ -1,63 +1,67 @@
 package controller;
 
+import dto.ReservationRequest;
 import model.Student;
 import model.Subject;
+import model.TutoringSession;
 import repository.StudentRepository;
-
+import service.SessionService; // NUEVA IMPORTACIÓN
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api") // Esto hace que todas las rutas empiecen con /api automáticamente
+@RequestMapping("/api")
 public class StudentController {
 
     private final StudentRepository studentRepo;
+    private final SessionService sessionService; // Nuestro nuevo gerente
 
-    // INYECCIÓN DE DEPENDENCIAS: Spring Boot nos entrega el repositorio listo para usar
-    public StudentController(StudentRepository studentRepo) {
+    public StudentController(StudentRepository studentRepo, SessionService sessionService) {
         this.studentRepo = studentRepo;
+        this.sessionService = sessionService;
     }
 
     @GetMapping("/status")
     public String checkStatus() {
-        return "¡El Sistema de Gestión de Tutorías está online y listo para recibir peticiones!";
+        return "¡El Sistema de Gestión está online!";
     }
 
     @GetMapping("/subjects")
     public List<Subject> getAvailableSubjects() {
-        List<Subject> subjects = new ArrayList<>();
-        subjects.add(new Subject("Algebra"));
-        subjects.add(new Subject("Physics"));
-        subjects.add(new Subject("Chemistry"));
-        return subjects;
+        // El controlador ya no crea la lista, se la pide al servicio
+        return sessionService.getSubjectCatalog();
     }
 
-    // NUEVO ROUTER POST MEJORADO CON REGLAS DE NEGOCIO
     @PostMapping("/students")
     public ResponseEntity<?> registerStudent(@RequestBody Student student) {
-        
-        // REGLA 1: Validar unicidad de identidad
         if (studentRepo.existsByEmail(student.getEmail())) {
-            // Si el correo existe, devolvemos un error HTTP 409 (Conflicto)
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body("Error de Negocio: El correo '" + student.getEmail() + "' ya se encuentra registrado.");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Error: El correo '" + student.getEmail() + "' ya existe.");
         }
-
-        // Si sobrevive a la validación, lo guardamos
         studentRepo.save(student);
-        
-        // Devolvemos el alumno con un éxito HTTP 201 (Creado)
         return ResponseEntity.status(HttpStatus.CREATED).body(student);
     }
 
-    // NUEVO: Router para ver todos los alumnos guardados
     @GetMapping("/students")
     public List<Student> getAllStudents() {
         return studentRepo.findAll();
+    }
+
+    // EL ENDPOINT DE RESERVAS REFACTORIZADO
+    @PostMapping("/sessions")
+    public ResponseEntity<?> createReservation(@RequestBody ReservationRequest request) {
+        try {
+            // El controlador solo delega la tarea al servicio
+            TutoringSession newSession = sessionService.processReservation(request.getEmail(), request.getSubjectName());
+            return ResponseEntity.status(HttpStatus.CREATED).body(newSession);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 }
